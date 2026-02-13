@@ -1,0 +1,2 @@
+# Continue: do not commit API keys
+.continue/.env

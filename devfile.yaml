@@ -10,6 +10,10 @@ components:
       image: quay.io/devfile/universal-developer-image:latest
       #memoryLimit: 4Gi
       mountSources: true
+      # Continue uses this env var for the model API key (inject via Secret with mount-as: env)
+      env:
+        - name: CONTINUE_API_KEY
+          value: ""
 
   # Optional: Adding a dedicated container for your runtime (e.g., Python, Node)
   - name: runtime

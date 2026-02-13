@@ -1,0 +1,19 @@
+# Continue.dev configuration for Dev Spaces
+# The model API key is read from the CONTINUE_API_KEY environment variable,
+# which you inject into the workspace via an OpenShift Secret (see README).
+name: Dev Spaces AI
+version: "1.0.0"
+schema: v1
+
+models:
+  - name: llama-3-2-3b
+    provider: openai
+    model: llama-3-2-3b
+    apiBase: https://llama-3-2-3b-maas-apicast-production.apps.prod.rhoai.rh-aiservices-bu.com:443/v1
+    apiKey: localEnv:CONTINUE_API_KEY
+    roles:
+      - chat
+      - edit
+      - apply
+  # Add more models as needed (e.g. Anthropic, OpenRouter).
+  # Use apiKey: localEnv:CONTINUE_API_KEY or provider-specific env vars.
