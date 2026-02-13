@@ -20,4 +20,21 @@ components:
     container:
       image: quay.io/devfile/universal-developer-image:latest
       #memoryLimit: 2Gi
-      
+
+commands:
+  # Copy repo .continue/config.yaml to user home so Continue uses it
+  - id: copy-continue-config
+    exec:
+      component: vscode-editor
+      commandLine: "sh -c \"mkdir -p /home/user/.continue && cp $PROJECTS_ROOT/.continue/config.yaml /home/user/.continue/config.yaml\""
+
+  # Install Continue CLI globally
+  - id: install-continue-cli
+    exec:
+      component: vscode-editor
+      commandLine: npm i -g @continuedev/cli
+
+events:
+  postStart:
+    - copy-continue-config
+    - install-continue-cli
