@@ -26,13 +26,13 @@ commands:
   - id: copy-continue-config
     exec:
       component: vscode-editor
-      commandLine: "sh -c \"mkdir -p /home/user/.continue && cp $PROJECTS_ROOT/.continue/config.yaml /home/user/.continue/config.yaml\""
+      commandLine: "sh -c \"echo '[postStart] Copying .continue/config.yaml to ~/.continue...' && mkdir -p /home/user/.continue && cp $PROJECTS_ROOT/.continue/config.yaml /home/user/.continue/config.yaml && echo '[postStart] Done: .continue/config.yaml copied to ~/.continue'\""
 
   # Install Continue CLI globally
   - id: install-continue-cli
     exec:
       component: vscode-editor
-      commandLine: npm i -g @continuedev/cli
+      commandLine: "sh -c \"echo '[postStart] Installing Continue CLI (npm i -g @continuedev/cli)...' && npm i -g @continuedev/cli && echo '[postStart] Done: Continue CLI installed'\""
 
 events:
   postStart:
