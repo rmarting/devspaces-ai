@@ -1,0 +1,19 @@
+schemaVersion: 2.2.0
+metadata:
+  name: vscode-continue-ai-env
+  description: "VS Code environment with Continue.dev AI assistant pre-installed"
+
+components:
+  # The VS Code editor component (extensions via .vscode/extensions.json)
+  - name: vscode-editor
+    container:
+      image: quay.io/devfile/universal-developer-image:latest
+      #memoryLimit: 4Gi
+      mountSources: true
+
+  # Optional: Adding a dedicated container for your runtime (e.g., Python, Node)
+  - name: runtime
+    container:
+      image: quay.io/devfile/universal-developer-image:latest
+      #memoryLimit: 2Gi
+      
