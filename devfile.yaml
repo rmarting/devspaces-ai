@@ -4,12 +4,20 @@ metadata:
   description: "VS Code environment with Continue.dev AI assistant pre-installed"
 
 components:
+  # Persistent volume for user home (~/.continue, settings, cache, etc.)
+  - name: home-volume
+    volume:
+      size: 5Gi
+
   # The VS Code editor component (extensions via .vscode/extensions.json)
   - name: vscode-editor
     container:
       image: quay.io/devfile/universal-developer-image:latest
       #memoryLimit: 4Gi
       mountSources: true
+      volumeMounts:
+        - name: home-volume
+          path: /home/user
       # Continue uses this env var for the model API key (inject via Secret with mount-as: env)
       env:
         - name: CONTINUE_API_KEY
@@ -22,11 +30,12 @@ components:
       #memoryLimit: 2Gi
 
 commands:
-  # Copy repo .continue/config.yaml to user home so Continue uses it
+  # Copy repo .continue/config.yaml to ~/.continue, resolving CONTINUE_API_KEY from env
+  # (env var is loaded from OpenShift Secret with mount-to-devworkspace + mount-as: env)
   - id: copy-continue-config
     exec:
       component: vscode-editor
-      commandLine: "sh -c \"echo '[postStart] Copying .continue/config.yaml to ~/.continue...' && mkdir -p /home/user/.continue && cp $PROJECTS_ROOT/.continue/config.yaml /home/user/.continue/config.yaml && echo '[postStart] Done: .continue/config.yaml copied to ~/.continue'\""
+      commandLine: "sh -c \"echo '[postStart] Copying .continue/config.yaml to ~/.continue (resolving CONTINUE_API_KEY from env)...' && mkdir -p /home/user/.continue && envsubst 'CONTINUE_API_KEY' < \\\"$PROJECT_SOURCE/.continue/config.yaml\\\" > /home/user/.continue/config.yaml && echo '[postStart] Done: .continue/config.yaml copied with API key from workspace env'\""
 
   # Install Continue CLI globally
   - id: install-continue-cli
@@ -35,6 +44,8 @@ commands:
       commandLine: "sh -c \"echo '[postStart] Installing Continue CLI (npm i -g @continuedev/cli)...' && npm i -g @continuedev/cli && echo '[postStart] Done: Continue CLI installed'\""
 
 events:
-  postStart:
+  preStart:
     - copy-continue-config
+
+  postStart:
     - install-continue-cli
