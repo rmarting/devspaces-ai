@@ -44,8 +44,6 @@ commands:
       commandLine: "sh -c \"echo '[postStart] Installing Continue CLI (npm i -g @continuedev/cli)...' && npm i -g @continuedev/cli && echo '[postStart] Done: Continue CLI installed'\""
 
 events:
-  preStart:
-    - copy-continue-config
-
   postStart:
+    - copy-continue-config  
     - install-continue-cli
