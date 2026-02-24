@@ -31,7 +31,7 @@ components:
 
 commands:
   # Copy repo .continue/config.yaml to ~/.continue, resolving CONTINUE_API_KEY from env
-  # (env var from OpenShift Secret with mount-as: env). Uses sed only (no envsubst).
+  # (env var from OpenShift Secret with mount-as: env). Uses awk to avoid sed back-reference issues.
   - id: copy-continue-config
     exec:
       component: vscode-editor
@@ -40,9 +40,10 @@ commands:
         echo '[postStart] Copying .continue/config.yaml to ~/.continue (resolving CONTINUE_API_KEY from env)...'
         mkdir -p /home/user/.continue
         key=\"$CONTINUE_API_KEY\"
-        key=\"${key//\\/\\\\}\"
-        key=\"${key//&/\\&}\"
-        sed \"s|\\${CONTINUE_API_KEY}|$key|g\" \"$PROJECT_SOURCE/.continue/config.yaml\" > /home/user/.continue/config.yaml
+        awk -v k=\"\$key\" '
+          BEGIN { gsub(/\\\\/, \"\\\\\\\\\", k); gsub(/&/, \"\\\\&\", k) }
+          { gsub(/\\\$\{CONTINUE_API_KEY\}/, k); print }
+        ' \"$PROJECT_SOURCE/.continue/config.yaml\" > /home/user/.continue/config.yaml
         echo '[postStart] Done: .continue/config.yaml copied with API key from workspace env'
         "
 
