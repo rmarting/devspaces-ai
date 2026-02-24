@@ -18,12 +18,6 @@ components:
       volumeMounts:
         - name: home-volume
           path: /home/user
-      # Continue: inject via Secret with mount-as: env (see README)
-      #env:
-      #  - name: CONTINUE_API_KEY
-      #    value: ""
-      #  - name: CONTINUE_API_URL
-      #    value: ""
 
   # Optional: Adding a dedicated container for your runtime (e.g., Python, Node)
   - name: runtime
@@ -41,16 +35,19 @@ commands:
         sh -c "
         echo '[postStart] Copying .continue/config.yaml to ~/.continue (resolving CONTINUE_API_KEY and CONTINUE_API_URL from env)...'
         mkdir -p /home/user/.continue
-        key=\"$CONTINUE_API_KEY\"
-        url=\"$CONTINUE_API_URL\"
-        awk -v k=\"\$key\" -v u=\"\$url\" '
+        name=\"$CONTINUE_MODEL_NAME\"
+        key=\"$CONTINUE_MODEL_API_KEY\"
+        url=\"$CONTINUE_MODEL_API_URL\"
+        awk -v n=\"\$name\" -v k=\"\$key\" -v u=\"\$url\" '
           BEGIN {
+            gsub(/\\\\/, \"\\\\\\\\\", n); gsub(/&/, \"\\\\&\", n)
             gsub(/\\\\/, \"\\\\\\\\\", k); gsub(/&/, \"\\\\&\", k)
             gsub(/\\\\/, \"\\\\\\\\\", u); gsub(/&/, \"\\\\&\", u)
           }
           {
-            gsub(/\\\$\{CONTINUE_API_KEY\}/, k)
-            gsub(/\\\$\{CONTINUE_API_URL\}/, u)
+            gsub(/\\\$\{CONTINUE_MODEL_NAME\}/, n)
+            gsub(/\\\$\{CONTINUE_MODEL_API_KEY\}/, k)
+            gsub(/\\\$\{CONTINUE_MODEL_API_URL\}/, u)
             print
           }
         ' \"$PROJECT_SOURCE/.continue/config.yaml\" > /home/user/.continue/config.yaml

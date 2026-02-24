@@ -11,15 +11,12 @@ version: "1.0.0"
 schema: v1
 
 models:
-  - name: llama-3-2-3b
+  - name: "${CONTINUE_MODEL_NAME}"
     provider: openai
-    model: llama-3-2-3b
-    # Replaced at copy time with CONTINUE_API_URL from the workspace env
-    apiBase: "${CONTINUE_API_URL}"
-    # Replaced at copy time with CONTINUE_API_KEY from the workspace env
-    apiKey: "${CONTINUE_API_KEY}"
+    model: "${CONTINUE_MODEL_NAME}"
+    apiBase: "${CONTINUE_MODEL_API_URL}"
+    apiKey: "${CONTINUE_MODEL_API_KEY}"
     roles:
       - chat
       - edit
       - apply
-  
