@@ -19,11 +19,11 @@ components:
         - name: home-volume
           path: /home/user
       # Continue: inject via Secret with mount-as: env (see README)
-      env:
-        - name: CONTINUE_API_KEY
-          value: ""
-        - name: CONTINUE_API_URL
-          value: ""
+      #env:
+      #  - name: CONTINUE_API_KEY
+      #    value: ""
+      #  - name: CONTINUE_API_URL
+      #    value: ""
 
   # Optional: Adding a dedicated container for your runtime (e.g., Python, Node)
   - name: runtime
