@@ -19,9 +19,9 @@ components:
         - name: home-volume
           path: /home/user
       # Continue uses this env var for the model API key (inject via Secret with mount-as: env)
-      env:
-        - name: CONTINUE_API_KEY
-          value: ""
+      #env:
+      #  - name: CONTINUE_API_KEY
+      #    value: ""
 
   # Optional: Adding a dedicated container for your runtime (e.g., Python, Node)
   - name: runtime
