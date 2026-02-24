@@ -18,10 +18,12 @@ components:
       volumeMounts:
         - name: home-volume
           path: /home/user
-      # Continue uses this env var for the model API key (inject via Secret with mount-as: env)
-      #env:
-      #  - name: CONTINUE_API_KEY
-      #    value: ""
+      # Continue: inject via Secret with mount-as: env (see README)
+      env:
+        - name: CONTINUE_API_KEY
+          value: ""
+        - name: CONTINUE_API_URL
+          value: ""
 
   # Optional: Adding a dedicated container for your runtime (e.g., Python, Node)
   - name: runtime
@@ -30,21 +32,29 @@ components:
       #memoryLimit: 2Gi
 
 commands:
-  # Copy repo .continue/config.yaml to ~/.continue, resolving CONTINUE_API_KEY from env
-  # (env var from OpenShift Secret with mount-as: env). Uses awk to avoid sed back-reference issues.
+  # Copy repo .continue/config.yaml to ~/.continue, resolving CONTINUE_API_KEY and CONTINUE_API_URL from env
+  # (env vars from OpenShift Secret with mount-as: env). Uses awk to avoid sed back-reference issues.
   - id: copy-continue-config
     exec:
       component: vscode-editor
       commandLine: |
         sh -c "
-        echo '[postStart] Copying .continue/config.yaml to ~/.continue (resolving CONTINUE_API_KEY from env)...'
+        echo '[postStart] Copying .continue/config.yaml to ~/.continue (resolving CONTINUE_API_KEY and CONTINUE_API_URL from env)...'
         mkdir -p /home/user/.continue
         key=\"$CONTINUE_API_KEY\"
-        awk -v k=\"\$key\" '
-          BEGIN { gsub(/\\\\/, \"\\\\\\\\\", k); gsub(/&/, \"\\\\&\", k) }
-          { gsub(/\\\$\{CONTINUE_API_KEY\}/, k); print }
+        url=\"$CONTINUE_API_URL\"
+        awk -v k=\"\$key\" -v u=\"\$url\" '
+          BEGIN {
+            gsub(/\\\\/, \"\\\\\\\\\", k); gsub(/&/, \"\\\\&\", k)
+            gsub(/\\\\/, \"\\\\\\\\\", u); gsub(/&/, \"\\\\&\", u)
+          }
+          {
+            gsub(/\\\$\{CONTINUE_API_KEY\}/, k)
+            gsub(/\\\$\{CONTINUE_API_URL\}/, u)
+            print
+          }
         ' \"$PROJECT_SOURCE/.continue/config.yaml\" > /home/user/.continue/config.yaml
-        echo '[postStart] Done: .continue/config.yaml copied with API key from workspace env'
+        echo '[postStart] Done: .continue/config.yaml copied with API key and URL from workspace env'
         "
 
   # Install Continue CLI globally

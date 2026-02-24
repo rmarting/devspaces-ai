@@ -1,8 +1,10 @@
 # Continue.dev configuration for Dev Spaces (template)
 #
 # The copy-continue-config postStart command copies this file to ~/.continue/
-# and replaces ${CONTINUE_API_KEY} with the value from the workspace env var
-# (loaded from an OpenShift Secret with mount-as: env). Do not put real keys here.
+# and replaces placeholders with workspace env vars (from an OpenShift Secret with mount-as: env):
+#   ${CONTINUE_API_KEY} → CONTINUE_API_KEY
+#   ${CONTINUE_API_URL} → CONTINUE_API_URL (model API base URL, e.g. https://.../v1)
+# Do not put real keys or URLs here.
 #
 name: Dev Spaces AI
 version: "1.0.0"
@@ -12,11 +14,12 @@ models:
   - name: llama-3-2-3b
     provider: openai
     model: llama-3-2-3b
-    apiBase: https://llama-3-2-3b-maas-apicast-production.apps.prod.rhoai.rh-aiservices-bu.com:443/v1
-    # Replaced at copy time with the value of CONTINUE_API_KEY from the workspace env
+    # Replaced at copy time with CONTINUE_API_URL from the workspace env
+    apiBase: "${CONTINUE_API_URL}"
+    # Replaced at copy time with CONTINUE_API_KEY from the workspace env
     apiKey: "${CONTINUE_API_KEY}"
     roles:
       - chat
       - edit
       - apply
-  # Add more models; use "${CONTINUE_API_KEY}" or another env var for substitution
+  
