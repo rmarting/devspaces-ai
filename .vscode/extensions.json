@@ -1,5 +1,7 @@
 {
   "recommendations": [
-    "continue.continue"
+    "continue.continue",
+    "RooVeterinaryInc.roo-cline",
+    "redhat.mta-vscode-extension"
   ]
 }

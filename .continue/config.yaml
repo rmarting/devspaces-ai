@@ -2,9 +2,11 @@
 #
 # The copy-continue-config postStart command copies this file to ~/.continue/
 # and replaces placeholders with workspace env vars (from an OpenShift Secret with mount-as: env):
-#   ${CONTINUE_API_KEY} → CONTINUE_API_KEY
-#   ${CONTINUE_API_URL} → CONTINUE_API_URL (model API base URL, e.g. https://.../v1)
+#   ${CONTINUE_MODEL_NAME}, ${CONTINUE_MODEL_API_KEY}, ${CONTINUE_MODEL_API_URL}
 # Do not put real keys or URLs here.
+#
+# MCP servers are configured via the standard mcp.json file in .continue/mcpServers/
+# (see .continue/mcpServers/mcp.json); Continue picks that up automatically.
 #
 name: Dev Spaces AI
 version: "1.0.0"

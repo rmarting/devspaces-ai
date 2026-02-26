@@ -26,14 +26,13 @@ components:
       #memoryLimit: 2Gi
 
 commands:
-  # Copy repo .continue/config.yaml to ~/.continue, resolving CONTINUE_API_KEY and CONTINUE_API_URL from env
-  # (env vars from OpenShift Secret with mount-as: env). Uses awk to avoid sed back-reference issues.
+  # Copy repo .continue/config.yaml to ~/.continue, resolving env placeholders from OpenShift Secret (mount-as: env).
   - id: copy-continue-config
     exec:
       component: vscode-editor
       commandLine: |
         sh -c "
-        echo '[postStart] Copying .continue/config.yaml to ~/.continue (resolving CONTINUE_API_KEY and CONTINUE_API_URL from env)...'
+        echo '[postStart] Copying .continue/config.yaml to ~/.continue (resolving env placeholders)...'
         mkdir -p /home/user/.continue
         name=\"$CONTINUE_MODEL_NAME\"
         key=\"$CONTINUE_MODEL_API_KEY\"
@@ -51,7 +50,26 @@ commands:
             print
           }
         ' \"$PROJECT_SOURCE/.continue/config.yaml\" > /home/user/.continue/config.yaml
-        echo '[postStart] Done: .continue/config.yaml copied with API key and URL from workspace env'
+        echo '[postStart] Done: .continue/config.yaml copied'
+        "
+
+  # Copy standard mcp.json to ~/.continue/mcpServers/, resolving CONTEXT7_API_KEY from env (optional).
+  - id: copy-mcp-config
+    exec:
+      component: vscode-editor
+      commandLine: |
+        sh -c "
+        echo '[postStart] Copying .continue/mcpServers/mcp.json to ~/.continue/mcpServers/ (resolving CONTEXT7_API_KEY)...'
+        mkdir -p /home/user/.continue/mcpServers
+        ctx7key=\"$CONTEXT7_API_KEY\"
+        awk -v c7=\"\$ctx7key\" '
+          BEGIN {
+            gsub(/\\\\/, \"\\\\\\\\\", c7)
+            gsub(/\"/, \"\\\\\\\"\", c7)
+          }
+          { gsub(/\\\$\{CONTEXT7_API_KEY\}/, c7); print }
+        ' \"$PROJECT_SOURCE/.continue/mcpServers/mcp.json\" > /home/user/.continue/mcpServers/mcp.json
+        echo '[postStart] Done: mcp.json copied (MCP servers enabled for Continue agent mode)'
         "
 
   # Install Continue CLI globally
@@ -62,5 +80,6 @@ commands:
 
 events:
   postStart:
-    - copy-continue-config  
+    - copy-continue-config
+    - copy-mcp-config
     - install-continue-cli
