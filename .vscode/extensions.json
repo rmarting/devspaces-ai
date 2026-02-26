@@ -2,6 +2,7 @@
   "recommendations": [
     "continue.continue",
     "RooVeterinaryInc.roo-cline",
-    "redhat.mta-vscode-extension"
+    "redhat.mta-vscode-extension",
+    "redhat.java"
   ]
 }
