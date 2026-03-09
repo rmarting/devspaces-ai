@@ -2,7 +2,10 @@
   "recommendations": [
     "continue.continue",
     "RooVeterinaryInc.roo-cline",
+    "redhat.vscode-commons",
+    "redhat.vscode-yaml",
+    "redhat.java",
     "redhat.mta-vscode-extension",
-    "redhat.java"
+    "redhat.vscode-openshift-connector"
   ]
 }
